@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta property="og:title" content="Kwizlet" />
+    <meta
+      property="og:description"
+      content="This free alternative to Quizlet gives you four modes to study vocabulary from a CSV file."
+    />
+    <meta
+      property="og:image"
+      content="https://github.com/pagedeploy/cdn/blob/main/kwizlet/kwizlet.png?raw=true"
+    />
+    <meta property="og:url" content="https://pagedeploy.github.io/kwizlet" />
+    <meta property="og:type" content="website" />
+
+    <title>Kwizlet</title>
+    <link
+      rel="icon"
+      href="https://github.com/pagedeploy/cdn/blob/main/kwizlet/favicon.png?raw=true"
+      type="image/png"
+    />
+    
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="wrapper">
+      <h1>Kwizlet</h1>
+
+      <p class="blurb">This free alternative to Quizlet with four study modes is fast and simple, with no limits or accounts needed. Upload your own CSV file with each line formatted as <code>term, definition, optional_image_url</code>, no header needed, or utilize the provided generator. This site runs completely in-browser and was mostly vibe-coded using ChatGPT and Copilot.</p>
+
+      <input type="file" id="csvFile" accept=".csv" />
+
+      <section id="generator">
+        <h3>Or generate your own ...</h3>
+        <div id="termRows"></div>
+        <button onclick="addTermRow()">Add Term</button>
+        <button onclick="generateCSV()">Generate CSV</button>
+      </section>
+
+      <nav class="hidden" id="nav">
+        <button onclick="showList()">List</button>
+        <button onclick="startFlashcards()">Flashcards</button>
+        <button onclick="startLearn()">Learn</button>
+        <button onclick="startMatch()">Match</button>
+        <button onclick="startGravity()">Gravity</button>
+      </nav>
+
+      <section id="list" class="hidden">
+        <h2>Terms</h2>
+        <p>Browse every term and its associated definition or image. Star your favorites to study only those.</p>
+        <ul id="termList"></ul>
+      </section>
+
+      <section id="flashcards" class="hidden">
+        <h2>Flashcards (<span id="fcProgress"></span>)</h2>
+        <p>Go through each term one-by-one, revealing the definition with the space bar and going to the next one with the enter key. Keep track of your progress and shuffle the remaining card order if desired, which still keeps your progress.</p>
+        <div class="card" id="flashcard"></div>
+        <button id="fcNextBtn">Next</button>
+        <button id="fcShuffleBtn" onclick="shuffleRemainingFC()">Shuffle Remaining</button>
+      </section>
+
+      <section id="learn" class="hidden">
+        <h2>Learn (<span id="learnProgress"></span>)</h2>
+        <p>Test yourself with some multiple choice questions, where keys 1 through 4 correspond to each answer. Retry missed terms until you master them all. Warning: swapping between answering with the term or definition resets progress.</p>
+        <div class="card" id="learnTerm"></div>
+        <div class="options" id="options"></div>
+        <div class="learn-controls">
+          <button id="learnNextBtn" disabled>Next</button>
+          <button id="learnShuffleBtn" onclick="shuffleRemainingLearn()">Shuffle Remaining</button>
+          <button id="learnModeBtn" onclick="toggleLearnMode()">Switch to Definition Mode</button>
+        </div>
+      </section>
+
+      <section id="match" class="hidden">
+        <h2>Match</h2>
+        <p> Connect terms with their definition or image in this 3×4 grid game and race for your best time.</p>
+        <div id="matchSetup">
+          <p id="matchMessage"></p>
+          <button id="matchStartBtn" onclick="startMatchGame()">Start</button>
+        </div>
+        <div id="matchGame" class="hidden">
+          <div id="matchTimer">Time: <span id="timerDisplay">0:00</span></div>
+          <div id="matchGrid" class="match-grid"></div>
+        </div>
+      </section>
+
+      <section id="gravity" class="hidden">
+        <h2>Gravity</h2>
+        <p>Protect your planet from incoming asteroids by typing the falling terms before they land. Clearing all five will advance you to the next level, which slowly speeds up.</p>
+        <div class="gravity-header">
+          <div>Level: <span id="gravityLevel">1</span></div>
+          <div>High Score: <span id="gravityHighScore">0</span></div>
+        </div>
+        <button id="gravityToggleBtn" onclick="toggleGravityGame()" style="text-align: left; margin-bottom: 20px;">Start Game</button>
+        <div id="gravityGameContainer" class="hidden">
+          <div id="gravityGameArea" class="gravity-game-area">
+            <div id="gravityLevelCircle" class="gravity-level-circle"></div>
+          </div>
+          <input type="text" id="gravityInput" placeholder="Type the term..." class="gravity-input" />
+          <div id="gravityMessage" class="gravity-message"></div>
+        </div>
+      </section>
+
+      <section id="summary" class="hidden">
+        <h2>Learn</h2>
+        <p>Test yourself with some multiple choice questions, where keys 1 through 4 correspond to each answer. Retry missed terms until you master them all. Warning: swapping between answering with the term or definition resets progress.</p>
+        <h3>Score Summary</h3>
+        <div id="scoreText"></div>
+        <button onclick="showList()">Back to List</button>
+        <button id="retryMissedBtn" onclick="retryMissed()" class="hidden">Retry Missed</button>
+      </section>
+    </div>
+
+    <footer class="footer">&copy; 2026 Sachin Agrawal</footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
