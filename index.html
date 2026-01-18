@@ -29,7 +29,7 @@
     <div class="wrapper">
       <h1>Kwizlet</h1>
 
-      <p class="blurb">This free alternative to Quizlet with four study modes is fast and simple, with no limits or accounts needed. Upload your own CSV file with each line formatted as <code>term, definition, optional_image_url</code>, no header needed, or utilize the provided generator. This site runs completely in-browser and was mostly vibe-coded using ChatGPT and Copilot.</p>
+      <p class="blurb">This free alternative to Quizlet has four study modes, with no limits or accounts needed. Upload your own CSV file with each line formatted as <code>term, definition, optional_image_url</code> without a header. You can also use the provided generator, which stores all uploaded images as text. This site runs completely in-browser and was mostly vibe-coded using ChatGPT and Copilot.</p>
 
       <input type="file" id="csvFile" accept=".csv" />
 
@@ -114,7 +114,10 @@
       </section>
     </div>
 
-    <footer class="footer">&copy; 2026 Sachin Agrawal</footer>
+    <footer class="footer">
+      <div>&copy; 2026 Sachin Agrawal <a href="/legal.html">Privacy & Terms</a></div>
+      <div class="disclaimer">Disclaimer: This site is an independent study tool and is not affiliated with, endorsed by, or associated with Quizlet or any other third-party service.</div>
+    </footer>
 
     <script src="script.js"></script>
   </body>
