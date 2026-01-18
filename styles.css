@@ -52,6 +52,7 @@ button {
   font-family: 'Hurme', system-ui, sans-serif;
   border-radius: 6px;
   border: 1px solid #000;
+  color: #000;
 }
 
 button:disabled {
@@ -68,6 +69,7 @@ input[type=file]::file-selector-button {
   font-family: 'Hurme', system-ui, sans-serif;
   border-radius: 6px;
   border: 1px solid #000;
+  color: #000;
 }
 
 .hidden {
