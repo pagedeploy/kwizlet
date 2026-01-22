@@ -878,7 +878,7 @@ function handleGravityInput(e) {
     for (let i = 0; i < gravityHexagons.length; i++) {
       const hex = gravityHexagons[i]
       
-      if (!hex.matched && hex.term === input) {
+      if (!hex.matched && hex.term.trim().toLowerCase() === input.toLowerCase()) {
         if (hex.y > maxY) {
           maxY = hex.y
           matchingHex = { hex, index: i }
