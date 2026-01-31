@@ -23,15 +23,28 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <div class="theme-toggle" id="themeToggle">
+      <button id="themeLightBtn" class="theme-btn" onclick="setTheme('light')" title="Light">
+        <i data-lucide="sun"></i>
+      </button>
+      <button id="themeDarkBtn" class="theme-btn" onclick="setTheme('dark')" title="Dark">
+        <i data-lucide="moon"></i>
+      </button>
+      <button id="themeAutoBtn" class="theme-btn active" onclick="setTheme('auto')" title="Auto">
+        <i data-lucide="monitor" id="autoIcon"></i>
+      </button>
+    </div>
     <div class="wrapper">
       <h1>Kwizlet</h1>
 
-      <p class="blurb">This free alternative to Quizlet has four study modes, with no limits or accounts needed. Upload your own CSV file with each line formatted as <code>term, definition, optional_image_url</code> without a header. You can also use the provided generator, which stores all uploaded images as text. This site runs completely in-browser and was mostly vibe-coded using ChatGPT and Copilot.</p>
+      <p class="blurb">This free alternative to Quizlet has four study modes, with no limits or accounts needed. Upload your own CSV file with each line formatted as <code>term, definition, optional_image_url</code> without a header. You can also use the provided generator, which stores all uploaded images as text. This site runs completely in-browser and most of the JavaScript was vibe-coded using GitHub Copilot.</p>
 
-      <input type="file" id="csvFile" accept=".csv" />
+      <button id="uploadBtn" style="margin: 20px 0px;">Upload CSV</button>
+      <div id="recentFilesContainer"></div>
 
       <section id="generator">
         <h3>Or generate your own ...</h3>
@@ -41,15 +54,15 @@
       </section>
 
       <nav class="hidden" id="nav">
-        <button onclick="showList()">List</button>
-        <button onclick="startFlashcards()">Flashcards</button>
-        <button onclick="startLearn()">Learn</button>
-        <button onclick="startMatch()">Match</button>
-        <button onclick="startGravity()">Gravity</button>
+        <button onclick="showList()"><i data-lucide="list"></i> List</button>
+        <button onclick="startFlashcards()"><i data-lucide="layers"></i> Flashcards</button>
+        <button onclick="startLearn()"><i data-lucide="book-open"></i> Learn</button>
+        <button onclick="startMatch()"><i data-lucide="puzzle"></i> Match</button>
+        <button onclick="startGravity()"><i data-lucide="orbit"></i> Gravity</button>
       </nav>
 
       <section id="list" class="hidden">
-        <h2>Terms</h2>
+        <h2>Terms <span id="filename"></span></h2>
         <p>Browse every term and its associated definition or image. Star your favorites to study only those.</p>
         <ul id="termList"></ul>
       </section>
@@ -120,5 +133,9 @@
     </footer>
 
     <script src="script.js"></script>
+    <script src="theme.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
   </body>
 </html>

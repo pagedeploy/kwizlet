@@ -23,9 +23,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <div class="theme-toggle" id="themeToggle">
+      <button id="themeLightBtn" class="theme-btn" onclick="setTheme('light')" title="Light">
+        <i data-lucide="sun"></i>
+      </button>
+      <button id="themeDarkBtn" class="theme-btn" onclick="setTheme('dark')" title="Dark">
+        <i data-lucide="moon"></i>
+      </button>
+      <button id="themeAutoBtn" class="theme-btn active" onclick="setTheme('auto')" title="Auto">
+        <i data-lucide="monitor" id="autoIcon"></i>
+      </button>
+    </div>
     <div class="wrapper">
       <h1>Kwizlet</h1>
 
@@ -34,8 +46,8 @@
       <h3>Privacy Policy</h3>
       <ul>
         <li>This website does not collect, store, or share any personal data.</li>
-        <li>No tracking, analytics, or advertising cookies are used.</li>
-        <li>Uploaded content (such as study materials) is processed locally in your browser and is not transmitted to a server.</li>
+        <li>No tracking, analytics, or advertising cookies are used, and nothing is transmitted to third parties.</li>
+        <li>Uploaded content (such as study sets or materials) is processed and saved locally in your browser.</li>
       </ul>
       
       <h3>Terms of Service</h3>
@@ -59,5 +71,10 @@
       <div>&copy; 2026 Sachin Agrawal <a href="legal">Privacy & Terms</a></div>
       <div class="disclaimer">Disclaimer: This site is an independent study tool and is not affiliated with, endorsed by, or associated with Quizlet or any other third-party service.</div>
     </footer>
+
+    <script src="theme.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
   </body>
 </html>

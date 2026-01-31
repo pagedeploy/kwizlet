@@ -11,6 +11,7 @@ let score = 0
 let answered = false
 let correctLog = []
 let summaryJustShown = false
+let currentFilename = ''
 
 // Match game state
 let matchCards = []
@@ -20,9 +21,6 @@ let matchTimerInterval = null
 let matchPairsFound = 0
 let matchBestTime = null
 let matchSelectedElements = []
-
-// Generator state
-let termRowCount = 0
 
 // Gravity game state
 let gravityLevel = 1
@@ -37,8 +35,88 @@ let gravityFallInterval = null
 let gravityEnteredTerms = []
 let gravityGameStarted = false
 
-// Initialize with one empty row
+// Generator state
+let termRowCount = 0
+
+// Recent files management
+const MAX_RECENT_FILES = 3
+const RECENT_FILES_KEY = 'kwizletRecentFiles'
+
+function saveRecentFile(csvContent, filename) {
+  const recentFiles = JSON.parse(localStorage.getItem(RECENT_FILES_KEY) || '[]')
+  
+  // Create new file entry with timestamp
+  const newFile = {
+    id: Date.now().toString(),
+    name: filename,
+    content: csvContent,
+    timestamp: new Date().toLocaleString()
+  }
+  
+  recentFiles.unshift(newFile)
+  recentFiles.splice(MAX_RECENT_FILES)
+  
+  localStorage.setItem(RECENT_FILES_KEY, JSON.stringify(recentFiles))
+  updateRecentFilesDisplay()
+}
+
+// Delete a recent file by ID
+function deleteRecentFile(id) {
+  const recentFiles = JSON.parse(localStorage.getItem(RECENT_FILES_KEY) || '[]')
+  const filtered = recentFiles.filter(f => f.id !== id)
+  localStorage.setItem(RECENT_FILES_KEY, JSON.stringify(filtered))
+  updateRecentFilesDisplay()
+}
+
+// Load a recent file by ID
+function loadRecentFile(id) {
+  const recentFiles = JSON.parse(localStorage.getItem(RECENT_FILES_KEY) || '[]')
+  const file = recentFiles.find(f => f.id === id)
+  if (!file) return
+  
+  data = parseCSV(file.content)
+  currentFilename = file.name
+  starredIndices.clear()
+  nav.classList.remove('hidden')
+  document.getElementById('generator').classList.add('hidden')
+  showList()
+  updateFilenameDisplay()
+}
+
+// Update the recent files display
+function updateRecentFilesDisplay() {
+  const container = document.getElementById('recentFilesContainer')
+  if (!container) return
+  
+  const recentFiles = JSON.parse(localStorage.getItem(RECENT_FILES_KEY) || '[]')
+  
+  if (recentFiles.length === 0) {
+    container.innerHTML = '<p>No recent files</p>'
+    return
+  }
+  
+  let html = '<div style="margin-top: 0; padding-bottom: 20px;"><p style="margin: 0 0 16px 0;">Recent Files:</p>'
+  html += '<div style="display: flex; flex-direction: column; gap: 8px;">'
+  
+  recentFiles.forEach(file => {
+    html += `
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 20px; background: var(--bg-secondary); border-radius: 12px; box-shadow: 0 2px 4px rgba(0, 0, 0, .05);">
+        <div style="flex: 1; cursor: pointer; min-width: 0;" onclick="loadRecentFile('${file.id}')">
+          <div style="font-size: 0.95rem; color: var(--text-primary); word-break: break-word;">${file.name}</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">${file.timestamp}</div>
+        </div>
+        <button onclick="deleteRecentFile('${file.id}')" class="remove-btn" style="margin-left: 10px;">×</button>
+      </div>
+    `
+  })
+  
+  html += '</div></div>'
+  container.innerHTML = html
+}
+
+// Initialize on page load
 window.addEventListener('DOMContentLoaded', () => {
+  updateRecentFilesDisplay()
   addTermRow()
 })
 
@@ -125,11 +203,14 @@ function generateCSV() {
     return
   }
   
+  const filename = 'kwizlet.csv'
+  saveRecentFile(csvContent, filename)
+  
   const blob = new Blob([csvContent], { type: 'text/csv' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = 'kwizlet.csv'
+  a.download = filename
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
@@ -169,18 +250,59 @@ function parseCSV(text) {
 }
 
 // File upload handler
-csvFile.onchange = e => {
-  const file = e.target.files[0]
-  if (!file) return
-  const reader = new FileReader()
-  reader.onload = () => {
-    data = parseCSV(reader.result)
-    starredIndices.clear()
-    nav.classList.remove('hidden')
-    document.getElementById('generator').classList.add('hidden')
-    showList()
+// Handle file upload button click
+document.getElementById('uploadBtn').addEventListener('click', () => {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.csv'
+
+  input.onchange = () => {
+    const file = input.files[0]
+    if (!file) return
+    currentFilename = file.name
+    const reader = new FileReader()
+    reader.onload = () => {
+      const csvContent = reader.result
+      data = parseCSV(csvContent)
+      saveRecentFile(csvContent, currentFilename)
+      starredIndices.clear()
+      nav.classList.remove('hidden')
+      document.getElementById('generator').classList.add('hidden')
+      showList()
+      updateFilenameDisplay()
+    }
+    reader.readAsText(file)
   }
-  reader.readAsText(file)
+
+  input.click()
+})
+
+// Legacy support for csvFile if it exists
+if (document.getElementById('csvFile')) {
+  csvFile.onchange = e => {
+    const file = e.target.files[0]
+    if (!file) return
+    currentFilename = file.name
+    const reader = new FileReader()
+    reader.onload = () => {
+      data = parseCSV(reader.result)
+      starredIndices.clear()
+      nav.classList.remove('hidden')
+      document.getElementById('generator').classList.add('hidden')
+      showList()
+      updateFilenameDisplay()
+    }
+    reader.readAsText(file)
+  }
+}
+
+// Update filename display
+function updateFilenameDisplay() {
+  const filenameSpan = document.getElementById('filename')
+  if (filenameSpan && currentFilename) {
+    const trimmedName = currentFilename.replace(/\.csv$/i, '')
+    filenameSpan.textContent = ` - ${trimmedName}`
+  }
 }
 
 // Show specific view and hide others
