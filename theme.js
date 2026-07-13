@@ -1,30 +1,23 @@
 let currentTheme = 'auto'
 
+// DOM helper to get an element by ID
+const byId = id => document.getElementById(id)
+
+// Read the saved theme, falling back to auto
+const savedTheme = () => localStorage.getItem('kwizletTheme') || 'auto'
+
 // Initialize theme on page load
 function initTheme() {
-  const savedTheme = localStorage.getItem('kwizletTheme') || 'auto'
-  currentTheme = savedTheme
-  applyTheme(savedTheme)
+  currentTheme = savedTheme()
+  applyTheme(currentTheme)
   updateThemeButtonStates()
 }
 
 // Apply to the document
 function applyTheme(theme) {
-  if (theme === 'auto') {
-    document.body.classList.remove('light-mode', 'dark-mode')
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    if (isDark) {
-      document.body.classList.add('dark-mode')
-    } else {
-      document.body.classList.add('light-mode')
-    }
-  } else if (theme === 'dark') {
-    document.body.classList.remove('light-mode')
-    document.body.classList.add('dark-mode')
-  } else {
-    document.body.classList.remove('dark-mode')
-    document.body.classList.add('light-mode')
-  }
+  const isDark = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+  document.body.classList.toggle('dark-mode', isDark)
+  document.body.classList.toggle('light-mode', !isDark)
 }
 
 // Set theme to specific value
@@ -37,27 +30,17 @@ function setTheme(theme) {
 
 // Update button active states
 function updateThemeButtonStates() {
-  const autoBtn = document.getElementById('themeAutoBtn')
-  const lightBtn = document.getElementById('themeLightBtn')
-  const darkBtn = document.getElementById('themeDarkBtn')
-  
-  if (autoBtn) autoBtn.classList.toggle('active', currentTheme === 'auto')
-  if (lightBtn) lightBtn.classList.toggle('active', currentTheme === 'light')
-  if (darkBtn) darkBtn.classList.toggle('active', currentTheme === 'dark')
-  
+  const buttons = { themeAutoBtn: 'auto', themeLightBtn: 'light', themeDarkBtn: 'dark' }
+  for (const [id, theme] of Object.entries(buttons)) byId(id)?.classList.toggle('active', currentTheme === theme)
   updateAutoIcon()
 }
 
 // Update auto theme icon
 function updateAutoIcon() {
-  const autoIcon = document.getElementById('autoIcon')
+  const autoIcon = byId('autoIcon')
   if (!autoIcon) return
-  
-  const isWide = window.innerWidth > 768
-  autoIcon.setAttribute('data-lucide', isWide ? 'monitor' : 'smartphone')
-  if (window.lucide) {
-    lucide.createIcons()
-  }
+  autoIcon.setAttribute('data-lucide', window.innerWidth > 768 ? 'monitor' : 'smartphone')
+  if (window.lucide) lucide.createIcons()
 }
 
 // Listen for device theme changes
@@ -69,20 +52,14 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
 })
 
 // Listen for window resize
-window.addEventListener('resize', () => {
-  updateAutoIcon()
-})
+window.addEventListener('resize', updateAutoIcon)
 
 // Listen for page visibility changes
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden === false) {
-    const savedTheme = localStorage.getItem('kwizletTheme') || 'auto'
-    if (savedTheme !== currentTheme) {
-      currentTheme = savedTheme
-      applyTheme(savedTheme)
-      updateThemeButtonStates()
-    }
-  }
+  if (document.hidden || savedTheme() === currentTheme) return
+  currentTheme = savedTheme()
+  applyTheme(currentTheme)
+  updateThemeButtonStates()
 })
 
 // Initialize on load
